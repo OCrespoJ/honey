@@ -7,7 +7,7 @@ return array(
       'default' => 
       array(
         0 => '001_usuarios',
-        1 => '002_game',
+        1 => '002_games',
       ),
     ),
     'module' => 

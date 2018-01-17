@@ -45,7 +45,8 @@ class Controller_Games extends Controller_Rest
                 {
                 $json = $this->response(array(
                     'code' => 401,
-                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios'
+                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios',
+                    'data' => null
                 ));
 
                 return $json;
@@ -72,7 +73,8 @@ class Controller_Games extends Controller_Rest
 
                     $json = $this->response(array(
                         'code' => 201,
-                       'message' => 'Partida creada'
+                        'message' => 'Partida creada',
+                        'data' => null
                     ));
                     return $json;
                 }
@@ -85,8 +87,9 @@ class Controller_Games extends Controller_Rest
                     $game->save();
 
                     $json = $this->response(array(
-                        'code' => 201,
-                       'message' => 'Partida guardada'
+                        'code' => 202,
+                        'message' => 'Partida guardada',
+                        'data' => null
                     ));
                     return $json;
                 }
@@ -95,7 +98,8 @@ class Controller_Games extends Controller_Rest
             {
                 $json = $this->response(array(
                     'code' => 401,
-                    'message' => 'Token incorrecto, no tienes permiso'
+                    'message' => 'Token incorrecto, no tienes permiso',
+                    'data' => null
                 ));
 
                 return $json;
@@ -106,6 +110,7 @@ class Controller_Games extends Controller_Rest
             $json = $this->response(array(
                 'code' => 502,
                 'message' => $e->getMessage(),
+                'data' => null
             ));
 
             return $json;
@@ -143,7 +148,8 @@ class Controller_Games extends Controller_Rest
             {
                 $json = $this->response(array(
                     'code' => 401,
-                    'message' => 'Token incorrecto, no tienes permiso'
+                    'message' => 'Token incorrecto, no tienes permiso',
+                    'data' => null
                 ));
 
                 return $json;
@@ -154,6 +160,7 @@ class Controller_Games extends Controller_Rest
             $json = $this->response(array(
                 'code' => 502,
                 'message' => $e->getMessage(),
+                'data' => null
             ));
 
             return $json;
@@ -173,7 +180,7 @@ class Controller_Games extends Controller_Rest
 
                 $game = Model_Games::find('first', array(
                 'where' => array(
-                    array('titulo', $_POST['titulo'])
+                    array('id', $_POST['id'])
                     ),
                 ));
 
@@ -183,27 +190,41 @@ class Controller_Games extends Controller_Rest
                 {
                    $json = $this->response(array(
                         'code' => 401,
-                        'message' => 'parametros incorrectos/Los campos no pueden estar vacios'
+                        'message' => 'parametros incorrectos/Los campos no pueden estar vacios',
+                        'data' => null
                     ));
 
                     return $json; 
                 }
                 else
                 {
-                    $game->delete();
+                    if (empty($game)) {
                     $json = $this->response(array(
-                        'code' => 201,
-                        'message' => 'Partida borrada'
+                        'code' => 400,
+                        'message' => 'No hay ninguna partida con ese id',
+                        'data' => null
                     ));
-                
-                return $json;
+                    return $json;
+                    } 
+                    else
+                    {
+                        $game->delete();
+                        $json = $this->response(array(
+                            'code' => 201,
+                            'message' => 'Partida borrada',
+                            'data' => null
+                        ));
+                    return $json;
+                    }
+                    
                 }
             }
             else
             {
                 $json = $this->response(array(
                     'code' => 402,
-                    'message' => 'Token incorrecto, no tienes permiso'
+                    'message' => 'Token incorrecto, no tienes permiso',
+                    'data' => null
                 ));
 
                 return $json;
@@ -214,6 +235,7 @@ class Controller_Games extends Controller_Rest
             $json = $this->response(array(
                 'code' => 501,
                 'message' => $e->getMessage(),
+                'data' => null
             ));
 
             return $json;
@@ -229,24 +251,41 @@ class Controller_Games extends Controller_Rest
             if ($this->authorization($token) == true){
                
                 $decoded = JWT::decode($token, $this->key, array('HS256'));
+                $id = $decoded->id;
 
                 $game = Model_Games::find('first', array(
                 'where' => array(
-                    array('titulo', $_GET['titulo'])
+                    array('titulo', $_GET['titulo']),
+                    array('id_usuario', $id)
                     ),
                 ));
-                $json = $this->response(array(
-                'code' => 200,
-                'data' => $game,
-            ));
+                if (empty($game)) {
+                    $json = $this->response(array(
+                        'code' => 400,
+                        'message' => 'No hay ninguna partida con ese nombre',
+                        'data' => null
+                    ));
                 return $json;
+                }
+                else
+                {
+                    
+                   $json = $this->response(array(
+                        'code' => 200,
+                        'message' => 'Partida cargada',
+                        'data' => $game
+                    ));
+                return $json;
+                }
+                
 
             }
             else
             {
                 $json = $this->response(array(
                     'code' => 402,
-                    'message' => 'Token incorrecto, no tienes permiso'
+                    'message' => 'Token incorrecto, no tienes permiso',
+                    'data' => null
                 ));
 
                 return $json;
@@ -257,6 +296,7 @@ class Controller_Games extends Controller_Rest
             $json = $this->response(array(
                 'code' => 501,
                 'message' => $e->getMessage(),
+                'data' => null
             ));
 
             return $json;

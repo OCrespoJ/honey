@@ -65,6 +65,7 @@ class Controller_Users extends Controller_Rest
                 $json = $this->response(array(
                     'code' => 401,
                     'message' => 'El usuario no existe o contraseña incorrecta',
+                    'data' => null
                 ));
                return $json;
             }
@@ -74,6 +75,7 @@ class Controller_Users extends Controller_Rest
             $json = $this->response(array(
                 'code' => 501,
                 'message' => $e->getMessage(),
+                'data' => null
             ));
 
             return $json;
@@ -93,7 +95,8 @@ class Controller_Users extends Controller_Rest
             {
                 $json = $this->response(array(
                     'code' => 402,
-                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios'
+                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios',
+                    'data' => null
                 ));
 
                 return $json;
@@ -110,6 +113,7 @@ class Controller_Users extends Controller_Rest
                $json = $this->response(array(
                     'code' => 403,
                     'message' => 'Ya existe un usuario con este username',
+                    'data' => null
                 ));
                return $json;
             }
@@ -125,6 +129,7 @@ class Controller_Users extends Controller_Rest
                $json = $this->response(array(
                     'code' => 404,
                     'message' => 'Ya existe un usuario con este email',
+                    'data' => null
                 ));
                return $json;
             }
@@ -149,6 +154,7 @@ class Controller_Users extends Controller_Rest
             $json = $this->response(array(
                 'code' => 502,
                 'message' => $e->getMessage(),
+                'data' => null
             ));
 
             return $json;
@@ -170,7 +176,8 @@ class Controller_Users extends Controller_Rest
                 $user->delete();
                 $json = $this->response(array(
                     'code' => 201,
-                    'message' => 'usuario borrado'
+                    'message' => 'usuario borrado',
+                    'data' => null
                 ));
                 return $json;
             
@@ -179,7 +186,8 @@ class Controller_Users extends Controller_Rest
             {
                 $json = $this->response(array(
                     'code' => 401,
-                    'message' => 'Token incorrecto, no tienes permiso'
+                    'message' => 'Token incorrecto, no tienes permiso',
+                    'data' => null
                 ));
 
                 return $json;
@@ -190,6 +198,7 @@ class Controller_Users extends Controller_Rest
             $json = $this->response(array(
                 'code' => 501,
                 'message' => $e->getMessage(),
+                'data' => null
             ));
 
             return $json;
@@ -202,7 +211,8 @@ class Controller_Users extends Controller_Rest
             {
                 $json = $this->response(array(
                     'code' => 402,
-                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios'
+                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios',
+                    'data' => null
                 ));
                 return $json;
             }
@@ -218,10 +228,16 @@ class Controller_Users extends Controller_Rest
                $json = $this->response(array(
                     'code' => 403,
                     'message' => 'No existe un usuario con este correo',
+                    'data' => null
                 ));
                 return $json;
             } else {
-                return $user;
+                $json = $this->response(array(
+                    'code' => 200,
+                    'message' => 'El correo existe',
+                    'data' => $user
+                ));
+                return $json;
             }
         }
 
@@ -234,7 +250,8 @@ class Controller_Users extends Controller_Rest
             {
                 $json = $this->response(array(
                     'code' => 402,
-                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios'
+                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios',
+                    'data' => null
                 ));
                 return $json;
             }
@@ -250,6 +267,7 @@ class Controller_Users extends Controller_Rest
                $json = $this->response(array(
                     'code' => 403,
                     'message' => 'No existe un usuario con este correo',
+                    'data' => null
                 ));
                return $json;
             }
@@ -259,6 +277,7 @@ class Controller_Users extends Controller_Rest
             $json = $this->response(array(
                 'code' => 201,
                 'message' => 'Contraseña cambiada',
+                'data' => null
             ));
 
             return $json;
