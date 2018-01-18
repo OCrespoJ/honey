@@ -14,6 +14,9 @@ class Model_Users extends Orm\Model
         ),
         'pass' => array(
             'data_type' => 'varchar'   
+        ),
+        'numPartidas' => array(
+            'data_type' => 'int'   
         )
     );
 }

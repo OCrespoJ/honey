@@ -31,6 +31,19 @@ class Controller_Users extends Controller_Rest
     public function get_login()
     {
         try {
+            if ( ! isset($_GET['username']) or
+                 ! isset($_GET['pass']) or
+                 $_GET['username'] == "" or
+                 $_GET['pass'] == "") 
+            {
+                $json = $this->response(array(
+                    'code' => 402,
+                    'message' => 'parametros incorrectos/Los campos no pueden estar vacios',
+                    'data' => null
+                ));
+
+                return $json;
+            }
 
             $users = Model_users::find('first', array(
                 'where' => array(
@@ -139,6 +152,7 @@ class Controller_Users extends Controller_Rest
             $user->username = $input['username'];
             $user->email = $input['email'];
             $user->pass = $input['pass'];
+            $user->numPartidas = 0;
             $user->save();
             $json = $this->response(array(
                 'code' => 202,

@@ -2,7 +2,7 @@
 
 namespace Fuel\Migrations;
 
-class Game
+class Games
 {
 
     function up()

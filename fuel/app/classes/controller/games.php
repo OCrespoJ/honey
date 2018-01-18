@@ -37,6 +37,7 @@ class Controller_Games extends Controller_Rest
                
                 $decoded = JWT::decode($token, $this->key, array('HS256'));
                 $id = $decoded->id;
+                $numPartidas = $decoded->numPartidas;
 
                 if (! isset($_POST['titulo']) or $_POST['titulo'] == "" or
                     ! isset($_POST['vidas']) or $_POST['vidas'] == "" or 
@@ -61,22 +62,34 @@ class Controller_Games extends Controller_Rest
                 ));
 
                 if (empty($game)) {
+                    if($numPartidas < 3){
+                        //crear partida
+                        $game = new Model_Games();
+                        $game->titulo = $_POST['titulo'];
+                        $game->vidas = $_POST['vidas'];
+                        $game->posicion = $_POST['posicion'];
+                        $game->progreso = $_POST['progreso'];
+                        $game->id_usuario = $id;
+                        $game->save();
 
-                   //crear partida
-                    $game = new Model_Games();
-                    $game->titulo = $_POST['titulo'];
-                    $game->vidas = $_POST['vidas'];
-                    $game->posicion = $_POST['posicion'];
-                    $game->progreso = $_POST['progreso'];
-                    $game->id_usuario = $id;
-                    $game->save();
+                        $decoded->numPartidas = $numPartidas + 1;
 
-                    $json = $this->response(array(
-                        'code' => 201,
-                        'message' => 'Partida creada',
+                        $decoded->save();
+
+                        $json = $this->response(array(
+                            'code' => 201,
+                            'message' => 'Partida creada',
+                            'data' => null
+                        ));
+                        return $json;
+                    } else {
+                        $json = $this->response(array(
+                        'code' => 402,
+                        'message' => 'No puedes guardar mas de 3 partidas',
                         'data' => null
                     ));
                     return $json;
+                    }
                 }
                 else
                 {
@@ -253,6 +266,18 @@ class Controller_Games extends Controller_Rest
                 $decoded = JWT::decode($token, $this->key, array('HS256'));
                 $id = $decoded->id;
 
+                if ( ! isset($_GET['titulo']) or
+                 $_GET['titulo'] == "") 
+                {
+                   $json = $this->response(array(
+                        'code' => 401,
+                        'message' => 'parametros incorrectos/Los campos no pueden estar vacios',
+                        'data' => null
+                    ));
+
+                    return $json; 
+                }
+
                 $game = Model_Games::find('first', array(
                 'where' => array(
                     array('titulo', $_GET['titulo']),
@@ -295,6 +320,77 @@ class Controller_Games extends Controller_Rest
         {
             $json = $this->response(array(
                 'code' => 501,
+                'message' => $e->getMessage(),
+                'data' => null
+            ));
+
+            return $json;
+        }
+    }
+
+    public function get_ranking()
+    {
+        try {
+            $token = apache_request_headers()['Authorization'];
+
+            if ($this->authorization($token) == true){
+               
+                $decoded = JWT::decode($token, $this->key, array('HS256'));
+                $id = $decoded->id;
+
+                $games = Model_Games::find('all', array(
+                    'order_by' => array('progreso' => 'desc')
+                ));
+
+                $ranking;
+                $progreso;
+
+                foreach ($games as $key => $value) {
+                    $user = Model_Users::find('first', array(
+                        'where' => array(
+                        array('id', $value->id_usuario)
+                        ),
+                    ));
+
+                    $progreso[] = $value->progreso;
+                    $ranking[] = array("username"=>$user->username,"progreso"=>$value->progreso);
+                }
+                //rsort($progreso);
+
+                /*foreach ($progreso as $key => $value) {
+                    $user = Model_Users::find('first', array(
+                        'where' => array(
+                        array('id', $value->id_usuario)
+                        ),
+                    ));
+                    $ranking[] = array("username"=>$user->username,"progreso"=>$value);
+                }
+                */
+
+            $json = $this->response(array(
+                    'code' => 200,
+                    'message' => 'Ranking mostrado',
+                    'data' => $ranking
+                ));
+
+                return $json;
+
+            }
+            else
+            {
+                $json = $this->response(array(
+                    'code' => 401,
+                    'message' => 'Token incorrecto, no tienes permiso',
+                    'data' => null
+                ));
+
+                return $json;
+            }
+        } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 502,
                 'message' => $e->getMessage(),
                 'data' => null
             ));

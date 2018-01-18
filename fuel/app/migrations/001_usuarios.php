@@ -12,7 +12,8 @@ class Usuarios
             'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
             'username' => array('type' => 'varchar', 'constraint' => 50),
             'email' => array('type' => 'varchar', 'constraint' => 50),
-            'pass' => array('type' => 'varchar', 'constraint' => 50)
+            'pass' => array('type' => 'varchar', 'constraint' => 50),
+            'numPartidas' => array('type' => 'int', 'constraint' => 1)
             ), array('id'), false, 'InnoDB', 'utf8_general_ci');
 
     }
