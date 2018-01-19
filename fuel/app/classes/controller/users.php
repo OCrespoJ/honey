@@ -58,7 +58,8 @@ class Controller_Users extends Controller_Rest
                 $token = array(
                     'id'  => $users['id'],
                     'username' => $_GET['username'],
-                    'pass' => $_GET['pass']
+                    'pass' => $_GET['pass'],
+                    'numPartidas' => $users['numPartidas']
                 );
             
             $jwt = JWT::encode($token, $this->key);

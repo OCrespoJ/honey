@@ -37,7 +37,7 @@ class Controller_Games extends Controller_Rest
                
                 $decoded = JWT::decode($token, $this->key, array('HS256'));
                 $id = $decoded->id;
-                $numPartidas = $decoded->numPartidas;
+                //$numPartidas = $decoded->numPartidas;
 
                 if (! isset($_POST['titulo']) or $_POST['titulo'] == "" or
                     ! isset($_POST['vidas']) or $_POST['vidas'] == "" or 
@@ -61,8 +61,14 @@ class Controller_Games extends Controller_Rest
                     ),
                 ));
 
+                //Buscar usuario
+                $user = Model_users::find('first', array(
+                    'where' => array(
+                        array('id', $id)
+                    ),
+                ));
                 if (empty($game)) {
-                    if($numPartidas < 3){
+                    if($user->numPartidas < 3){
                         //crear partida
                         $game = new Model_Games();
                         $game->titulo = $_POST['titulo'];
@@ -72,9 +78,8 @@ class Controller_Games extends Controller_Rest
                         $game->id_usuario = $id;
                         $game->save();
 
-                        $decoded->numPartidas = $numPartidas + 1;
-
-                        $decoded->save();
+                        $user->numPartidas += 1;
+                        $user->save();
 
                         $json = $this->response(array(
                             'code' => 201,
@@ -149,7 +154,7 @@ class Controller_Games extends Controller_Rest
                 ));
 
             $json = $this->response(array(
-                    'code' => 401,
+                    'code' => 200,
                     'message' => 'Partidas mostradas',
                     'data' => $games
                 ));
@@ -193,10 +198,15 @@ class Controller_Games extends Controller_Rest
 
                 $game = Model_Games::find('first', array(
                 'where' => array(
-                    array('id', $_POST['id'])
+                    array('id', $_POST['id']),
                     ),
                 ));
 
+                $user = Model_users::find('first', array(
+                'where' => array(
+                    array('id', $id)
+                    ),
+                ));
 
                 if ( ! isset($_POST['id']) or
                  $_POST['id'] == "") 
@@ -221,15 +231,28 @@ class Controller_Games extends Controller_Rest
                     } 
                     else
                     {
-                        $game->delete();
-                        $json = $this->response(array(
-                            'code' => 201,
-                            'message' => 'Partida borrada',
-                            'data' => null
-                        ));
-                    return $json;
+                        if ($game->id_usuario == $user->id) {
+                            $game->delete();
+                            $user->numPartidas -= 1;
+                            $user->save();
+
+                            $json = $this->response(array(
+                                'code' => 201,
+                                'message' => 'Partida borrada',
+                                'data' => null
+                            ));
+                            return $json;
+                        } 
+                        else 
+                        {
+                            $json = $this->response(array(
+                                'code' => 401,
+                                'message' => 'No tiener permiso para borrar partidas de otros usuarios',
+                                'data' => null
+                            ));
+                            return $json;
+                        }
                     }
-                    
                 }
             }
             else
@@ -355,17 +378,6 @@ class Controller_Games extends Controller_Rest
                     $progreso[] = $value->progreso;
                     $ranking[] = array("username"=>$user->username,"progreso"=>$value->progreso);
                 }
-                //rsort($progreso);
-
-                /*foreach ($progreso as $key => $value) {
-                    $user = Model_Users::find('first', array(
-                        'where' => array(
-                        array('id', $value->id_usuario)
-                        ),
-                    ));
-                    $ranking[] = array("username"=>$user->username,"progreso"=>$value);
-                }
-                */
 
             $json = $this->response(array(
                     'code' => 200,

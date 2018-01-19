@@ -7,7 +7,7 @@ class Games
 
     function up()
     {
-        \DBUtil::create_table('game', 
+        \DBUtil::create_table('games', 
             array(
             'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
             'titulo' => array('type' => 'varchar', 'constraint' => 50),
@@ -33,7 +33,7 @@ class Games
 
     function down()
     {
-       \DBUtil::drop_table('game');
+       \DBUtil::drop_table('games');
     }
 
 }
