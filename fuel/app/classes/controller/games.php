@@ -386,7 +386,8 @@ class Controller_Games extends Controller_Rest
                     ));
 
                     $progreso[] = $value->progreso;
-                    $ranking[] = array("username"=>$user->username,"progreso"=>$value->progreso);
+                    $ranking[] = array("username"=>$user->username,"partida"=>$value->titulo,"progreso"=>$value->progreso);
+
                 }
 
             $json = $this->response(array(
