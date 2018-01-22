@@ -247,7 +247,7 @@ class Controller_Games extends Controller_Rest
                         {
                             $json = $this->response(array(
                                 'code' => 401,
-                                'message' => 'No tiener permiso para borrar partidas de otros usuarios',
+                                'message' => 'No tienes permiso para borrar partidas de otros usuarios',
                                 'data' => null
                             ));
                             return $json;
@@ -364,6 +364,16 @@ class Controller_Games extends Controller_Rest
                 $games = Model_Games::find('all', array(
                     'order_by' => array('progreso' => 'desc')
                 ));
+
+                if (empty($games)) {
+                    $json = $this->response(array(
+                    'code' => 400,
+                    'message' => 'No hay partidas guardadas',
+                    'data' => null
+                ));
+
+                return $json;
+                }
 
                 $ranking;
                 $progreso;

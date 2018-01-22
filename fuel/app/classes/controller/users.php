@@ -103,9 +103,11 @@ class Controller_Users extends Controller_Rest
             if ( ! isset($_POST['username']) or
                  ! isset($_POST['email']) or
                  ! isset($_POST['pass']) or
+                 ! isset($_POST['repeatPass']) or
                  $_POST['username'] == "" or
                  $_POST['email'] == "" or
-                 $_POST['pass'] == "") 
+                 $_POST['pass'] == "" or
+                 $_POST['repeatPass'] == "") 
             {
                 $json = $this->response(array(
                     'code' => 402,
@@ -148,20 +150,33 @@ class Controller_Users extends Controller_Rest
                return $json;
             }
 
-            $input = $_POST;
-            $user = new Model_Users();
-            $user->username = $input['username'];
-            $user->email = $input['email'];
-            $user->pass = $input['pass'];
-            $user->numPartidas = 0;
-            $user->save();
-            $json = $this->response(array(
-                'code' => 202,
-                'message' => 'usuario creado',
-                'data' => null
-            ));
+            if ($_POST['pass'] == $_POST['repeatPass']) {
+                $input = $_POST;
+                $user = new Model_Users();
+                $user->username = $input['username'];
+                $user->email = $input['email'];
+                $user->pass = $input['pass'];
+                $user->numPartidas = 0;
+                $user->save();
+                $json = $this->response(array(
+                   'code' => 202,
+                   'message' => 'usuario creado',
+                    'data' => null
+                ));
 
             return $json;
+            }
+            else
+            {
+                $json = $this->response(array(
+                    'code' => 405,
+                    'message' => 'Las contraseñas no coinciden',
+                    'data' => null
+                ));
+               return $json;
+            }
+
+            
 
         } 
         catch (Exception $e) 
@@ -261,7 +276,8 @@ class Controller_Users extends Controller_Rest
         try {
             //Validar campos rellenos y nombre correcto
             if (! isset($_POST['email']) or $_POST['email'] == "" or 
-                ! isset($_POST['pass']) or $_POST['pass'] == "")
+                ! isset($_POST['pass']) or $_POST['pass'] == "" or
+                ! isset($_POST['repeatPass']) or $_POST['repeatPass'] == "")
             {
                 $json = $this->response(array(
                     'code' => 402,
@@ -287,15 +303,26 @@ class Controller_Users extends Controller_Rest
                return $json;
             }
 
-            $user->pass = $_POST['pass'];
-            $user->save();
-            $json = $this->response(array(
-                'code' => 201,
-                'message' => 'Contraseña cambiada',
-                'data' => null
-            ));
+            if ($_POST['pass'] == $_POST['repeatPass']) {
+                $user->pass = $_POST['pass'];
+                $user->save();
+                $json = $this->response(array(
+                    'code' => 201,
+                    'message' => 'Contraseña cambiada',
+                    'data' => null
+                ));
 
-            return $json;
+                return $json;
+            }
+            else
+            {
+                $json = $this->response(array(
+                    'code' => 404,
+                    'message' => 'Las contraseñas no coinciden',
+                    'data' => null
+                ));
+               return $json;
+            }
 
         } 
         catch (Exception $e) 
